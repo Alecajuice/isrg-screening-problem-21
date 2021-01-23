@@ -6,7 +6,30 @@ import re
 fields = ["High", "Low", "Open", "Close"]
 patterns = ["^[^a-z]*" + field.lower() + ".*" for field in fields] # The first alphabetical characters in the string must match the field
 
+def find(element, tag, attrs=None):
+    if attrs is None:
+        ret = element.find(tag)
+    else:
+        ret = element.find(tag, attrs)
+    if ret is None:
+        print("ERROR: Could not find " + tag + " in element", file=sys.stderr)
+        sys.exit(1)
+    return ret
+
+def findAll(element, tag, attrs=None):
+    if attrs is None:
+        ret = element.findAll(tag)
+    else:
+        ret = element.findAll(tag, attrs)
+    if len(ret) < 1:
+        print("ERROR: Could not find " + tag + " in element", file=sys.stderr)
+        sys.exit(1)
+    return ret
+
 # Read command line arguments
+if len(sys.argv) < 2:
+    print("Usage: py scrape.py [symbol]")
+    sys.exit(0)
 symbol = sys.argv[1]
 
 # Request data and parse
@@ -21,26 +44,30 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36'
 }
 page = requests.get(URL, headers)
+if not page: # Status code >400 (not OK)
+    print("ERROR: Server responded with status code " + str(page.status_code), file=sys.stderr)
+    sys.exit(1)
+
 soup = BeautifulSoup(page.content, 'html.parser')
-table = soup.find("table", {"data-test" : "historical-prices"})
+table = find(soup, "table", {"data-test" : "historical-prices"})
 
 # Find field indices from the table header
-head = table.find("thead")
-header_row = head.find("tr").findAll("th")
+head = find(table, "thead")
+header_row = findAll(find(head, "tr"), "th")
 field_indices = [None] * len(fields) # Preallocate for speed
 for i in range(len(header_row)):
     col = header_row[i]
-    text = col.find("span").text.lower()
+    text = find(col, "span").text.lower()
     for j in range(len(patterns)):
         pattern = patterns[j]
         if re.match(pattern, text):
             field_indices[j] = i
 
 # Find values for each field
-body = table.find("tbody")
-first_row = body.find("tr").findAll("td")
+body = find(table, "tbody")
+first_row = findAll(find(body, "tr"), "td")
 for i in range(len(fields)):
     field = fields[i]
     ind = field_indices[i]
     col = first_row[ind]
-    print(field + ": " + col.find("span").text)
+    print(field + ": " + find(col, "span").text)
