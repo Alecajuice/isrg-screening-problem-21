@@ -69,5 +69,8 @@ first_row = findAll(find(body, "tr"), "td")
 for i in range(len(fields)):
     field = fields[i]
     ind = field_indices[i]
-    col = first_row[ind]
-    print(field + ": " + find(col, "span").text)
+    if ind is None or ind >= len(first_row):
+        print("ERROR: Field not found: " + field + ". The website layout may have changed.", file=sys.stderr)
+    else:
+        col = first_row[ind]
+        print(field + ": " + find(col, "span").text)
