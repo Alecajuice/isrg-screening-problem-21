@@ -12,7 +12,7 @@ def find(element, tag, attrs=None):
     else:
         ret = element.find(tag, attrs)
     if ret is None:
-        print("ERROR: Could not find " + tag + " in element", file=sys.stderr)
+        print("ERROR: Could not find " + tag + " in element. The symbol may not exist or the website layout may have changed.", file=sys.stderr)
         sys.exit(1)
     return ret
 
@@ -22,7 +22,7 @@ def findAll(element, tag, attrs=None):
     else:
         ret = element.findAll(tag, attrs)
     if len(ret) < 1:
-        print("ERROR: Could not find " + tag + " in element", file=sys.stderr)
+        print("ERROR: Could not find " + tag + " in element. The symbol may not exist or the website layout may have changed.", file=sys.stderr)
         sys.exit(1)
     return ret
 
