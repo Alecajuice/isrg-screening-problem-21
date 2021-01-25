@@ -15,6 +15,16 @@ the dependencies properly (e.g. via requirements.txt)
   * design documentation (README.md),
   * architecture diagrams
   
+## Usage
+```
+python scrape.py ISRG
+```
+to look up prices for ISRG.
+```
+python test.py
+```
+to run the test script.
+
 ## Important files
 * `README.md` (this file): Contains documentation and architecture diagram
 * `scrape.py`: scraper script
